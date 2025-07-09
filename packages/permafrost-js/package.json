@@ -1,0 +1,17 @@
+{
+  "name": "@snowflake-software/permafrost-js",
+  "version": "0.0.2",
+  "description": "Software development kit for the Permafrost platform",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "typecheck": "tsc --noEmit --strict"
+  },
+  "author": "SnowflakeSoftware",
+  "license": "All Rights Reserved",
+  "devDependencies": {
+    "@snowflake-software/typescript-config": "workspace:*"
+  },
+  "dependencies": {}
+}

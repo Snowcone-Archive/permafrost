@@ -1,0 +1,21 @@
+@keyframes anim {
+  0% {
+    background-position: -100vw 0vh;
+  }
+
+  100% {
+    background-position: 0vw 0vh;
+  }
+}
+
+.account-disabled-container {
+  background-image: repeating-linear-gradient(-45deg, #ffffff06 0rem, #ffffff06 4rem, #fff0 4rem, #fff0 8rem);
+  background-size: 400% 400%;
+  background-color: #180204;
+
+  animation-name: anim;
+  animation-timing-function: linear;
+  animation-duration: 60s;
+  animation-fill-mode: both;
+  animation-iteration-count: infinite;
+}

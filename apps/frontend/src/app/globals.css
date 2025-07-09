@@ -1,0 +1,16 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  color: #f7f7fa;
+  background: #232642;
+}
+
+@layer base {
+  html,
+  body,
+  #root {
+    height: -webkit-fill-available;
+  }
+}

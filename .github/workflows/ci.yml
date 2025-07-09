@@ -1,0 +1,13 @@
+name: push-ci
+on: push
+jobs:
+  check-code:
+    name: check-code
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+      - run: bun install
+      - run: bun run prisma generate
+      - run: bun run build
+      - run: bun run test

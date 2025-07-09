@@ -1,0 +1,60 @@
+services:
+  db:
+    container_name: permafrost_pg
+    image: postgres:16-alpine
+    restart: unless-stopped
+    shm_size: 256mb
+    environment:
+      POSTGRES_USER: permafrost
+      POSTGRES_PASSWORD: permafrost
+    volumes:
+      - permafrost_postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "permafrost"]
+    ports:
+      - "5432:5432"
+
+  backend:
+    container_name: permafrost_backend
+    build:
+      dockerfile: backend.Dockerfile
+      context: .
+    restart: unless-stopped
+    depends_on:
+      - db
+    volumes:
+      - "./apps/backend/config.ts:/app/apps/backend/config.ts"
+      - "./apps/backend/applications_private.pem:/app/apps/backend/applications_private.pem"
+      - "./apps/backend/applications_public.pem:/app/apps/backend/applications_public.pem"
+      - "./apps/backend/users.pem:/app/apps/backend/users.pem"
+      - "./apps/backend/config.json:/app/apps/backend/config.json"
+      - permafrost_storage:/app/apps/backend/storage
+    ports:
+      - "1234:1234"
+    environment:
+      - PF_DATABASE_URL=postgresql://permafrost:permafrost@db/permafrost
+
+  frontend:
+    container_name: permafrost_frontend
+    build:
+      dockerfile: frontend.Dockerfile
+      context: .
+    restart: unless-stopped
+    depends_on:
+      - backend
+    ports:
+      - "3000:3000"
+
+  dragonfly:
+    image: "docker.dragonflydb.io/dragonflydb/dragonfly"
+    ulimits:
+      memlock: -1
+    volumes:
+      - dragonflydata:/data
+    ports:
+      - "6379:6379"
+
+volumes:
+  permafrost_postgres:
+  permafrost_storage:
+  dragonflydata:

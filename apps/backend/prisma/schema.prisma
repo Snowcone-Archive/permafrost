@@ -1,0 +1,182 @@
+generator client {
+  provider        = "prisma-client-js"
+  engineType      = "library"
+  previewFeatures = ["metrics"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("PF_DATABASE_URL")
+}
+
+enum AccountFlags {
+  // The account is disabled
+  Disabled
+  // The password requires changing
+  RequiresPasswordChange
+  // The account requires email verification. This is used for new accounts or when an admin changes a user's email.
+  RequiresEmailVerification
+  // An email verification is pending. This is used when a user changes their email.
+  PendingEmailVerification
+  // The account has been created by an admin via an E-Mail address, but the user has not yet set a password.
+  Pending
+}
+
+//enum EmailPreferences {
+//  All
+//  OnlyImportant
+//  None
+//}
+
+enum AccountPermissions {
+  SuperAdministrator
+  Administrator
+  CreateApplication
+}
+
+enum AuthorizationScopes {
+  profile
+  email
+}
+
+enum AuthenticationMethod {
+  Email
+  GitHub
+  Discord
+  Passkey
+}
+
+enum OAuthSignInPlatform {
+  GitHub
+  Discord
+}
+
+model OAuthSignInData {
+  id String @id @default(cuid())
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  platform         OAuthSignInPlatform
+  platformId       String
+  platformUsername String
+  enableLogin      Boolean             @default(true)
+}
+
+model User {
+  id                   String   @id @default(cuid())
+  email                String   @unique
+  username             String   @unique @map("name")
+  displayName          String?
+  password             String
+  passwordPepper       Boolean  @default(false)
+  twoFactor            String?
+  twoFactorBackupCodes String[]
+  resetData            Json?
+  // emailPreferences     EmailPreferences @default(All)
+
+  oauthSignInData OAuthSignInData[]
+
+  sessions       Session[]            @relation("usr-session")
+  flags          AccountFlags[]       @default([])
+  permissions    AccountPermissions[] @default([])
+  applications   Application[]        @relation("app-creator")
+  collaboratesOn Application[]        @relation("collaborator")
+  authorizations Authorization[]      @relation("usr-auth")
+  createdAt      DateTime             @default(now())
+  Passkey        Passkey[]
+}
+
+model Session {
+  id                   String                @id @default(cuid())
+  token                String                @unique
+  ipAddress            String
+  device               String
+  authenticationMethod AuthenticationMethod?
+  user                 User                  @relation("usr-session", fields: [userId], references: [id], onDelete: Cascade)
+  userId               String
+  lastActivity         DateTime              @default(now())
+}
+
+model Passkey {
+  id             String   @id @default(cuid())
+  name           String?
+  publicKey      Bytes    @db.ByteA
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId         String
+  webauthnUserID String   @unique
+  counter        Int      @default(0)
+  deviceType     String
+  backedUp       Boolean  @default(false)
+  transports     String[]
+  lastUsed       DateTime @default(now())
+  createdAt      DateTime @default(now())
+}
+
+model Application {
+  id                String          @id @default(cuid())
+  owner             User            @relation("app-creator", fields: [ownerId], references: [id], onDelete: Cascade)
+  collaborators     User[]          @relation("collaborator")
+  homepageURL       String?
+  termsOfServiceURL String?
+  privacyPolicyURL  String?
+  ownerId           String
+  name              String
+  authorizations    Authorization[] @relation("app-auth")
+  createdAt         DateTime        @default(now())
+  clientSecret      String          @unique
+  redirectURIs      String[]
+}
+
+model Authorization {
+  id            String                @id @default(cuid())
+  user          User                  @relation("usr-auth", fields: [userId], references: [id], onDelete: Cascade)
+  userId        String
+  application   Application           @relation("app-auth", fields: [applicationId], references: [id], onDelete: Cascade)
+  applicationId String
+  token         String                @unique
+  scopes        AuthorizationScopes[]
+  createdAt     DateTime              @default(now())
+  requestCode   TokenRequestCode?     @relation("cod-auth")
+}
+
+model TokenRequestCode {
+  id              String        @id @default(cuid())
+  authorization   Authorization @relation("cod-auth", fields: [authorizationId], references: [id], onDelete: Cascade)
+  authorizationId String        @unique
+  createdAt       DateTime      @default(now())
+}
+
+model UserAuditLogEntry {
+  id                    String   @id @default(cuid())
+  executingUserId       String
+  executingUserUsername String
+  affectedUserId        String
+  affectedUserUsername  String
+  type                  String
+  description           String
+  details               Json?
+  createdAt             DateTime @default(now())
+}
+
+model SystemAuditLogEntry {
+  id                    String   @id @default(cuid())
+  executingUserId       String
+  executingUserUsername String
+  type                  String
+  description           String
+  details               Json?
+  createdAt             DateTime @default(now())
+}
+
+model ApplicationAuditLogEntry {
+  id                      String   @id @default(cuid())
+  executingUserId         String
+  executingUserUsername   String
+  affectedApplicationId   String
+  affectedApplicationName String
+  type                    String
+  description             String
+  details                 Json?
+  createdAt               DateTime @default(now())
+}

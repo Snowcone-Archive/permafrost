@@ -1,0 +1,11 @@
+{
+  "MD033": {
+    "allowed_elements": ["cite"]
+  },
+  "MD013": {
+    "code_blocks": false,
+    "line_length": 125,
+    "tables": false,
+    "strict": false
+  }
+}

@@ -1,0 +1,22 @@
+@keyframes skelton {
+  0% {
+    background: #fff5;
+  }
+  50% {
+    background: #fff2;
+  }
+  100% {
+    background: #fff5;
+  }
+}
+
+.skeleton {
+  animation-duration: 1.5s;
+  animation-fill-mode: forwards;
+  animation-iteration-count: infinite;
+  animation-name: skelton;
+  animation-timing-function: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  border-radius: 10rem;
+  background: #fff2;
+  display: inline-block;
+}

@@ -1,0 +1,10 @@
+storage
+dist
+node_modules
+apps/backend/storage/
+.env
+state.json
+.pem
+.vscode
+.turbo
+.next

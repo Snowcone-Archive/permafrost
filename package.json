@@ -1,0 +1,27 @@
+{
+  "name": "permafrost",
+  "version": "2024.10.1",
+  "author": "Snowcone-Labs",
+  "devDependencies": {
+    "@types/bun": "^1.2.0",
+    "turbo": "2.5.4",
+    "typescript": "^5.7.3"
+  },
+  "description": "Permafrost Authentication Gateway",
+  "license": "All Rights Reserved",
+  "private": true,
+  "scripts": {
+    "dev": "turbo run dev",
+    "build": "turbo run build",
+    "typecheck": "turbo run typecheck",
+    "serve": "turbo run serve",
+    "test": "turbo run test-ci",
+    "prisma": "cd apps/backend && bunx prisma",
+    "cli": "cd apps/backend/src && bun run cli.ts"
+  },
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
+  "packageManager": "bun@1.2.0"
+}

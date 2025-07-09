@@ -1,0 +1,16 @@
+{
+  "name": "permafrost-docs",
+  "module": "index.ts",
+  "type": "module",
+  "devDependencies": {
+    "vitepress": "^1.5.0",
+    "vue": "^3.5.13",
+    "@snowflake-software/typescript-config": "workspace:*"
+  },
+  "scripts": {
+    "dev": "vitepress dev",
+    "preview": "vitepress preview --port 4000",
+    "serve": "vitepress preview --port 4000",
+    "build": "vitepress build"
+  }
+}
